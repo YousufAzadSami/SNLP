@@ -36,14 +36,24 @@ public class Test {
 		
 		int no_words = 13;
 		
-		int[] alpha = {1,1,1,1,1,1,1,1,1,1,1,1,1};
+		int[] alpha = {1,1,1,1};
 		
-		int[] beta = {1,1,1,1};
+		int[] beta = {1,1,1,1,1,1,1,1,1,1,1,1,1};
 		
 		
 		LDA_Computation computation = new LDA_Computation(4,no_words,alpha,beta);
 		
+		computation.addDocument(document1);
+		computation.addDocument(document2);
+		computation.addDocument(document3);
+		
+		
 		computation.sample(20);
+		
+		computation.printPhi();
+		computation.printTheta();
+		computation.printTopicAssignments();
+		
 		
 		
 		

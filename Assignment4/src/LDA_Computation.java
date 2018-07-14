@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 
 public class LDA_Computation {
@@ -37,9 +38,7 @@ public class LDA_Computation {
 		n_d_k= new HashMap<Integer,Map<Integer,Integer>>();
 		n_w_k = new HashMap<Integer,Map<String,Integer>>();
 		n_k = new HashMap<Integer,Integer>();
-		
-		
-		
+			
 	}
 	
 	public void sample(int T)
@@ -50,6 +49,10 @@ public class LDA_Computation {
 		
 		for (int t =0; t < T; t++)
 		{
+			System.out.print("Iteration: "+(t+1)+"\n");
+			
+			// printTopicAssignments();
+			
 			for (int i=0; i < words.size(); i++)
 			{
 				List<String> doc = words.get(i);
@@ -80,25 +83,192 @@ public class LDA_Computation {
 	
 	public void initializeTopics()
 	{
-		// leave that to you!
+		int random;
+		
+		List<Integer> topic_list = null;
+		List<String> word_list;
+		
+		Random rn = new Random();
+				
+		for (int i = 0; i < words.size(); i++)
+		{
+			topic_list = new ArrayList<Integer>();
+			word_list = words.get(i);
+			
+			for (int j=0; j < word_list.size(); j++)
+			{
+				random = rn.nextInt(no_topics);
+				topic_list.add(new Integer(random));
+				
+				updateTopic(new Integer(random),1);
+				updateWordTopic(word_list.get(j),new Integer(random),1);
+				updateDocumentTopic(new Integer(i+1),new Integer(random),1);
+				
+			}
+			topics.add(topic_list);	
+		}
+		
 	}
 	
-	public String printTopicAssignments()
+	public void printTopicAssignments()
 	{
-		// print the assignments
-		return "";
+		List<Integer> topic_list;
+		List<String> word_list;
+		
+		for (int i = 0; i < words.size(); i++)
+		{
+			System.out.print("Document: "+(i+1)+": ");
+			
+			topic_list = topics.get(i);
+			word_list = words.get(i);
+			
+			for (int j=0; j < word_list.size(); j++)
+			{
+				System.out.print(word_list.get(j)+"/"+topic_list.get(j)+"\t");
+				
+			}
+			System.out.print("\n");
+		}
 	}
 	
-	public String printPhi()
+	public void printPhi()
 	{
-		// print phi multinomial
-		return "";
+		Map<String,Integer> map;
+		double total = 0;
+		double value;
+		
+		System.out.print("Printing Word Topic Distribution Phi\n");
+		
+		for (int i= 0; i < no_topics; i++)
+		{
+			total = 0;
+			
+			System.out.print("Topic "+i+"\n");
+			
+			map = n_w_k.get(i);
+			
+			for (String word: map.keySet())
+			{
+				total += (double) map.get(word);
+			}
+			
+			for (String word: map.keySet())
+			{
+				value = (double) map.get(word);
+				value = value / total;
+				System.out.print(word+" -> "+ value+"\t");
+			}
+			
+			System.out.print("\n");
+			
+		}
 	}
 	
-	public String printTheta()
+	public void printTheta()
 	{
-		// for each document print the distribution theta per document
-		return "";
+		Map<Integer,Integer> map;
+		double total = 0;
+		double value;
+		
+		System.out.print("Printing Document Topic Distribution Theta\n");
+		
+		for (int i= 0; i < words.size(); i++)
+		{
+			total = 0;
+			
+			System.out.print("Document "+i+"\n");
+			
+			map = n_d_k.get(i+1);
+			
+			for (Integer topic: map.keySet())
+			{
+				total += (double) map.get(topic);
+			}
+			
+			for (Integer topic: map.keySet())
+			{
+				value = (double) map.get(topic);
+				value = value / total;
+				System.out.print(topic+" -> "+ value+"\t");
+			}
+			
+			System.out.print("\n");
+			
+		}
+		
+		
+	}
+	
+	public void updateTopic(Integer topic, Integer delta)
+	{
+		Integer value;
+		
+		if (n_k.containsKey(topic))
+		{
+			value = n_k.get(topic);
+			n_k.put(topic, value+delta);
+		}
+		else
+		{
+			n_k.put(topic, delta);
+		}
+	}
+	
+	public void updateWordTopic(String word, Integer topic, Integer delta)
+	{
+		Map<String,Integer> map;
+		Integer value;
+		
+		if (n_w_k.containsKey(topic))
+		{
+			map = n_w_k.get(topic);
+		}
+		else
+		{
+			map = new HashMap<String,Integer>();
+			n_w_k.put(topic, map);
+		}
+		
+		if (map.containsKey(word))
+		{
+			value = map.get(word);
+			value = value+delta;
+		}
+		else
+		{
+			value = 1;
+		}
+		map.put(word, value);
+		
+	}
+	
+	public void updateDocumentTopic(Integer doc, Integer topic, Integer delta)
+	{
+		Map<Integer,Integer> map;
+		Integer value;
+		
+		if (n_d_k.containsKey(doc))
+		{
+			map = n_d_k.get(doc);
+		}
+		else
+		{
+			map = new HashMap<Integer,Integer>();
+			n_d_k.put(doc, map);
+		}
+		
+		if (map.containsKey(topic))
+		{
+			value = map.get(topic);
+			value = value+delta;
+		}
+		else
+		{
+			value = 1;
+		}
+		map.put(topic, value);
+		
+		
 	}
 	
 	
