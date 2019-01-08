@@ -68,8 +68,8 @@ public class TaggerEvaluator {
 		
 		System.out.print("Evaluating on "+tagged_sentences.size()+" sentences!\n");
 		
-//		for (int i=0; i < tagged_sentences.size(); i++)
-		for (int i=0; i < 10; i++)
+		for (int i=0; i < tagged_sentences.size(); i++)
+//		for (int i=0; i < 10; i++)
 		{
 			tagged_sentence = tagged_sentences.get(i);
 			

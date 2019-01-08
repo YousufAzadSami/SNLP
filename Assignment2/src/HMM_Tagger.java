@@ -308,21 +308,19 @@ public class HMM_Tagger implements POS_Tagger {
 		
 		// iterate over the tokens of a sentence
 		for(int tokenIndex = 0; tokenIndex < sentence.size(); tokenIndex++) {
+			
 			String currentToken = sentence.getToken(tokenIndex);
-			System.out.println("Current Token : " + currentToken);
 			
 			// for inv_pos_index the index starts from 1
 			for(Map.Entry<Integer, String> firstPass : inv_pos_index.entrySet()) {
 				
-				// this might not be right 
-				// if((firstPass.getKey() - 1) == 0) {
 				if(tokenIndex == 0) {
 					// for starting case 
 					// value = emission * transition(start)
 					double tempProb = b(firstPass.getValue(), currentToken)
 										* a("start", firstPass.getValue());
 					delta[tokenIndex][firstPass.getKey() - 1] = tempProb;
-					// gamma[tokenIndex][firstPass.getKey() - 1] = -1;	
+					gamma[tokenIndex][firstPass.getKey() - 1] = 0;	
 				}
 				else {
 					
@@ -347,7 +345,7 @@ public class HMM_Tagger implements POS_Tagger {
 					}
 					// set value to delta
 					delta[tokenIndex][firstPass.getKey() - 1] = maxValue;
-					gamma[tokenIndex - 1][firstPass.getKey() - 1] = maxArg;
+					gamma[tokenIndex][firstPass.getKey() - 1] = maxArg;
 					
 				}
 				
@@ -364,33 +362,48 @@ public class HMM_Tagger implements POS_Tagger {
 //			System.out.println();
 //		}
 //		System.out.println("\n\n");
-		System.out.println("Print Gamma: ");
-		for(int i = 0; i < sentence.size(); i++) {
-			for(int j = 0; j < posSize; j++) {
-				System.out.print(gamma[i][j] + "\t");
-			}
-			System.out.println();
-		}
-		System.out.println("\n\n");
+//		System.out.println("Print Gamma: ");
+//		for(int i = 0; i < sentence.size(); i++) {
+//			for(int j = 0; j < posSize; j++) {
+//				System.out.print(gamma[i][j] + "\t");
+//			}
+//			System.out.println();
+//		}
+//		System.out.println("\n\n");
 		
 		int indexMaxGamma = -1;
 		double maxValue = -1; 
 		// get the pos index with maximum probability from the last row
 		for(int i = 0; i < posSize; i++) {
 			if(delta[sentence.size() - 1][i] > maxValue) {
+				maxValue = delta[sentence.size() - 1][i]; 
 				indexMaxGamma = i;
 			}
 		}
 		
+		int lasPosInd = gamma[sentence.size() - 1][indexMaxGamma];
+		String lastPos = inv_pos_index.get(lasPosInd + 1);
+		tagged_sentence.setTag(sentence.size() - 1, lastPos);
+		
+		
 		int indexOfPos = -1;
-		for(int tokenInedex = sentence.size() - 1; tokenInedex >= 0; tokenInedex--) {
+		for(int tokenInedex = sentence.size() - 1; tokenInedex >= 1; tokenInedex--) {
 			
-			// iterate over 
+			System.out.println("\nWord: " + tagged_sentence.getToken(tokenInedex) + " || POS: " + tagged_sentence.getPOS(tokenInedex));
+			
+			
 			indexOfPos = gamma[tokenInedex][indexMaxGamma];
 			String pos = inv_pos_index.get(indexOfPos + 1);
-			tagged_sentence.setTag(tokenInedex, pos);
+			tagged_sentence.setTag(tokenInedex - 1, pos);
 			
 			indexMaxGamma = indexOfPos;
+			
+			
+//			gamma[tokenInedex][]
+//			String pos = "";
+//			tagged_sentence.setTag(tokenInedex - 1, pos);
+			
+			System.out.println("Word: " + tagged_sentence.getToken(tokenInedex) + " || POS: " + tagged_sentence.getPOS(tokenInedex));
 		}
 		
 			
