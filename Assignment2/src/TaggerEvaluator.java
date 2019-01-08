@@ -68,15 +68,16 @@ public class TaggerEvaluator {
 		
 		System.out.print("Evaluating on "+tagged_sentences.size()+" sentences!\n");
 		
-		for (int i=0; i < tagged_sentences.size(); i++)
+//		for (int i=0; i < tagged_sentences.size(); i++)
+		for (int i=0; i < 10; i++)
 		{
 			tagged_sentence = tagged_sentences.get(i);
 			
-			System.out.println("Evaluating sentence: "+tagged_sentence);
+			System.out.println("Evaluating \t: "+tagged_sentence);
 		
 			TaggedSentence prediction = tagger.predict(new Sentence(tagged_sentence)); 
 		
-			System.out.println("Prediction: "+prediction);
+			System.out.println("Prediction\t: "+prediction);
 			System.out.println();
 			
 			for (int j=0; j < tagged_sentence.size(); j++)

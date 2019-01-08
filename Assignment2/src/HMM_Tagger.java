@@ -355,14 +355,15 @@ public class HMM_Tagger implements POS_Tagger {
 			
 		}
 		
-		System.out.println("Print Delta: ");
-		for(int i = 0; i < sentence.size(); i++) {
-			for(int j = 0; j < posSize; j++) {
-				System.out.print(delta[i][j] + "\t");
-			}
-			System.out.println();
-		}
-		System.out.println("\n\n");
+		
+//		System.out.println("Print Delta: ");
+//		for(int i = 0; i < sentence.size(); i++) {
+//			for(int j = 0; j < posSize; j++) {
+//				System.out.print(delta[i][j] + "\t");
+//			}
+//			System.out.println();
+//		}
+//		System.out.println("\n\n");
 		System.out.println("Print Gamma: ");
 		for(int i = 0; i < sentence.size(); i++) {
 			for(int j = 0; j < posSize; j++) {
@@ -372,37 +373,24 @@ public class HMM_Tagger implements POS_Tagger {
 		}
 		System.out.println("\n\n");
 		
-		int indexOfLastPos = -1;
 		int indexMaxGamma = -1;
 		double maxValue = -1; 
 		// get the pos index with maximum probability from the last row
 		for(int i = 0; i < posSize; i++) {
 			if(delta[sentence.size() - 1][i] > maxValue) {
 				indexMaxGamma = i;
-				indexOfLastPos = gamma[sentence.size() - 1][i];
 			}
 		}
-		
-		String posOfLastWord = inv_pos_index.get(indexOfLastPos);
 		
 		int indexOfPos = -1;
 		for(int tokenInedex = sentence.size() - 1; tokenInedex >= 0; tokenInedex--) {
 			
 			// iterate over 
-			// gamma[tokenInedex][]
 			indexOfPos = gamma[tokenInedex][indexMaxGamma];
 			String pos = inv_pos_index.get(indexOfPos + 1);
 			tagged_sentence.setTag(tokenInedex, pos);
 			
 			indexMaxGamma = indexOfPos;
-			
-//			 int temp2 = gamma[tokenInedex][temp - 1];
-//			 String pos2 = inv_pos_index.get(temp2);
-			
-//			int temp3 = gamma[tokenInedex][temp2 - 1];
-//			String pos3 = inv_pos_index.get(temp3);
-//			
-//			tagged_sentence.setTag(tokenInedex, "");
 		}
 		
 			
