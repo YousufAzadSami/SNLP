@@ -293,7 +293,6 @@ public class HMM_Tagger implements POS_Tagger {
 				
 	    int k = state_transitions.keySet().size();
 	    int posSize = k;
-	    // int test = state_transitions.size();
 		
 		double delta[][] = new double[sentence.size()][posSize];
 			
@@ -303,8 +302,6 @@ public class HMM_Tagger implements POS_Tagger {
 		
 		
 		// Implement Viterbi
-		
-		System.out.println("Sentence : " + sentence.toString() + "\n");
 		
 		// iterate over the tokens of a sentence
 		for(int tokenIndex = 0; tokenIndex < sentence.size(); tokenIndex++) {
@@ -317,8 +314,8 @@ public class HMM_Tagger implements POS_Tagger {
 				if(tokenIndex == 0) {
 					// for starting case 
 					// value = emission * transition(start)
-					double tempProb = b(firstPass.getValue(), currentToken)
-										* a("start", firstPass.getValue());
+					double tempProb = emission(firstPass.getValue(), currentToken)
+										* transition("start", firstPass.getValue());
 					delta[tokenIndex][firstPass.getKey() - 1] = tempProb;
 					gamma[tokenIndex][firstPass.getKey() - 1] = 0;	
 				}
@@ -334,8 +331,8 @@ public class HMM_Tagger implements POS_Tagger {
 						// * transition probability for firstPass pos wrt secondPass pos 
 						// * previous cell 
 						double currentValue = 
-								b(firstPass.getValue(), currentToken) * 
-								a(secondPass.getValue(), firstPass.getValue()) * 
+								emission(firstPass.getValue(), currentToken) * 
+								transition(secondPass.getValue(), firstPass.getValue()) * 
 								delta[tokenIndex - 1][secondPass.getKey() - 1];
 						
 						if(currentValue > maxValue) {
@@ -381,29 +378,22 @@ public class HMM_Tagger implements POS_Tagger {
 			}
 		}
 		
-		int lasPosInd = gamma[sentence.size() - 1][indexMaxGamma];
-		String lastPos = inv_pos_index.get(lasPosInd + 1);
+		String lastPos = inv_pos_index.get(indexMaxGamma + 1);
 		tagged_sentence.setTag(sentence.size() - 1, lastPos);
 		
 		
 		int indexOfPos = -1;
 		for(int tokenInedex = sentence.size() - 1; tokenInedex >= 1; tokenInedex--) {
 			
-			System.out.println("\nWord: " + tagged_sentence.getToken(tokenInedex) + " || POS: " + tagged_sentence.getPOS(tokenInedex));
-			
-			
+//			System.out.println("\nWord: " + tagged_sentence.getToken(tokenInedex) + " || POS: " + tagged_sentence.getPOS(tokenInedex));
+				
 			indexOfPos = gamma[tokenInedex][indexMaxGamma];
 			String pos = inv_pos_index.get(indexOfPos + 1);
-			tagged_sentence.setTag(tokenInedex - 1, pos);
-			
+			tagged_sentence.setTag(tokenInedex -1, pos);
 			indexMaxGamma = indexOfPos;
 			
 			
-//			gamma[tokenInedex][]
-//			String pos = "";
-//			tagged_sentence.setTag(tokenInedex - 1, pos);
-			
-			System.out.println("Word: " + tagged_sentence.getToken(tokenInedex) + " || POS: " + tagged_sentence.getPOS(tokenInedex));
+//			System.out.println("Word: " + tagged_sentence.getToken(tokenInedex) + " || POS: " + tagged_sentence.getPOS(tokenInedex));
 		}
 		
 			
@@ -446,7 +436,7 @@ public class HMM_Tagger implements POS_Tagger {
 	}
 
 	// emission probability 
-	private double b(String tag, String token) {
+	private double emission(String tag, String token) {
 		
 		// implement b method
 		// int i = state_emmission_counts.get(tag).get(token) / state_emmission_total.get(tag);
@@ -465,7 +455,7 @@ public class HMM_Tagger implements POS_Tagger {
 	}
 
 	// transition probablity 
-	private double a(String tag, String nextTag) {
+	private double transition(String tag, String nextTag) {
 		
 		// implement a method
 		// HashMap<String,HashMap<String,Double>> state_transitions;
